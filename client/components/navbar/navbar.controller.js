@@ -2,10 +2,10 @@
 
 angular.module('serveMeApp')
   .controller('NavbarCtrl', function ($scope, $location, Auth) {
-    $scope.menu = [{
-      'title': 'Home',
-      'link': '/'
-    }];
+    $scope.menu = [
+    {'title': 'Home','link': '/'},
+    {'title': 'Data','link': '/data'}
+    ];
 
     $scope.isCollapsed = true;
     $scope.isLoggedIn = Auth.isLoggedIn;
