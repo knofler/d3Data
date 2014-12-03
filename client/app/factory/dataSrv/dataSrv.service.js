@@ -3,63 +3,7 @@
 angular.module('serveMeApp')
   .service('dataSrv',['$rootScope', function ($rootScope) {
     // AngularJS will instantiate a singleton by calling "new" on this function
-
-    //make json or api call to get the data and run reusable chart functions, in this ase table function for a table
 	
-	// #### TABLE ######
-	
-	$rootScope.getStatic_JSONData = function(){
-		//Data Calling from static JSON
-		d3.json('assets/dataDir/data.json',function(err,pics){
-			// capture data in a avariable		
-			var data = pics.data.children;
-			data.forEach(function(d){
-				d.data.created *=1000;
-			 });
-
-			console.log(data);
-			//table
-
-			//parent Div where table will be inserted
-			var display = d3.select('.col-md-12');
-			//table container
-			var tdiv = display.append("div").classed("table-responsive",true);
-			//instantiate chart function
-			var table = d3.chart.tablejson();
-			//set Data to table
-			table.data(data);
-			//render table
-			table(tdiv);		
-
-			var svg = d3.select("#svg3")
-			//scatter plot
-			var sgroup = svg.append("g");
-			var scatter = d3.chart.scatter();
-			scatter.data(data);
-			scatter(sgroup);
-		 });	
-
-	 };
-	$rootScope.getAPI_JSONData	  = function(){
-		//data calling from api 
-		d3.json('/api/things/',function(err,thing){
-			//capture data in a avariable		
-			var data = thing;
-			//parent Div where table will be inserted
-			var display = d3.select('.col-md-12');
-
-			//table container
-			var tdiv = display.append("div").classed("table-responsive",true);
-			//instantiate chart function
-			var table = d3.chart.tableapi();
-			//set Data to table
-			table.data(data);
-			//render table
-			table(tdiv);		
-		 });	
-	 };	 
-	
-
 	// Construction of reusable table function in d3 chart object
 	
 	// *********************Table******************************
@@ -293,7 +237,65 @@ angular.module('serveMeApp')
 		}).style("pointer-events","none")
      };
 
+
+    // ######################## Calling d3 reusable chart functions ################################## 
+	//make json or api call to get the data and run reusable chart functions
+
+  	// *********************TABLE******************************
+
+	$rootScope.getStatic_JSONData = function(){
+		//Data Calling from static JSON
+		d3.json('assets/dataDir/data.json',function(err,pics){
+			// capture data in a avariable		
+			var data = pics.data.children;
+			data.forEach(function(d){
+				d.data.created *=1000;
+			 });
+
+			console.log(data);
+			//table
+
+			//parent Div where table will be inserted
+			var display = d3.select('.col-md-12');
+			//table container
+			var tdiv = display.append("div").classed("table-responsive",true);
+			//instantiate chart function
+			var table = d3.chart.tablejson();
+			//set Data to table
+			table.data(data);
+			//render table
+			table(tdiv);		
+
+			var svg = d3.select("#svg3")
+			//scatter plot
+			var sgroup = svg.append("g");
+			var scatter = d3.chart.scatter();
+			scatter.data(data);
+			scatter(sgroup);
+		 });	
+
+	 };
+	$rootScope.getAPI_JSONData	  = function(){
+		//data calling from api 
+		d3.json('/api/things/',function(err,thing){
+			//capture data in a avariable		
+			var data = thing;
+			//parent Div where table will be inserted
+			var display = d3.select('.col-md-12');
+
+			//table container
+			var tdiv = display.append("div").classed("table-responsive",true);
+			//instantiate chart function
+			var table = d3.chart.tableapi();
+			//set Data to table
+			table.data(data);
+			//render table
+			table(tdiv);		
+		 });	
+	 };	 
+
 	// *********************Histogram******************************
+
 	$rootScope.histogram =function(){ 
 		//histogram layout with reddit data json
 		d3.json('assets/dataDir/data.json',function(err,pics){
@@ -329,9 +331,7 @@ angular.module('serveMeApp')
 	 };	
 
 
-	// #### BAR CHART ######
-
-	//Bar chart with axis
+	// *********************BAR CHARTS******************************
 
 	// *******Chart configuration***********	
 	var margin = {top: 20, right: 50, bottom: 80, left: 50},
