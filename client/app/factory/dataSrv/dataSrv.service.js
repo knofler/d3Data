@@ -239,7 +239,7 @@ angular.module('serveMeApp')
 
 
     // ######################## Calling d3 reusable chart functions ################################## 
-	//make json or api call to get the data and run reusable chart functions
+	//make json or api call to get the data and run reusable chart functions,charts such as Table,scatter plot, histogram
 
   	// *********************TABLE******************************
 
