@@ -78,7 +78,7 @@ angular.module('serveMeApp')
 		
 		return chart;
      };
-    d3.chart.tableapi = function(){ 
+    d3.chart.tableapi  = function(){ 
 	
 		var data;
 		var width;
@@ -128,9 +128,8 @@ angular.module('serveMeApp')
 		
 		return chart;
      };  
-   
-	// *********************Scatter Polt******************************
-	d3.chart.scatter 	= function(){
+   	// *********************Scatter Polt******************************
+	d3.chart.scatter   = function(){
 		var g;
 		var data;
 		var width = 400;
@@ -187,9 +186,8 @@ angular.module('serveMeApp')
 		
 		return chart;
 	 }; 
-	 
     // *********************Brush******************************
- 	d3.chart.brush = function(){
+ 	d3.chart.brush 	   = function(){
     	var  g;
     	var data;
     	var width = 400;
@@ -242,7 +240,6 @@ angular.module('serveMeApp')
 	//make json or api call to get the data and run reusable chart functions,charts such as Table,scatter plot, histogram
 
   	// *********************TABLE******************************
-
 	$rootScope.getStatic_JSONData = function(){
 		//Data Calling from static JSON
 		d3.json('assets/dataDir/data.json',function(err,pics){
@@ -293,10 +290,8 @@ angular.module('serveMeApp')
 			table(tdiv);		
 		 });	
 	 };	 
-
 	// *********************Histogram******************************
-
-	$rootScope.histogram =function(){ 
+	$rootScope.histogram          = function(){ 
 		//histogram layout with reddit data json
 		d3.json('assets/dataDir/data.json',function(err,pics){
 		 var data = pics.data.children; 
