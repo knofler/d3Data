@@ -2,17 +2,13 @@
 
 angular.module('serveMeApp')
   .service('dataSrv',['$rootScope', function ($rootScope) {
-    // AngularJS will instantiate a singleton by calling "new" on this function
+
 	
-	// Construction of reusable table function in d3 chart object
-	
+	// Construction of reusable table function in d3 chart object	
 	// *********************Table******************************
 	if (!d3.chart) d3.chart = {};
-	d3.chart.tablejson = function(){ 
-	
-		var data;
-		var width;
-
+	d3.chart.table = function(addColumn){ 
+		var data,width;
 		//reusable chart pattern
 		function chart (container){
 			//initialization code
@@ -25,42 +21,13 @@ angular.module('serveMeApp')
 			var tbody = table.append('tbody');
 			//selectAll rows with with data to tbody element, use selectAll as this are dynamic entries and non exisyent till now.
 			var rows = tbody.selectAll("tr").data(data);
-
 			//create all dynamic rows with enter() command
 			var rowsEnter = rows.enter()
 			.append("tr");
-
 			//Create columns with cell data in each row --column-1
-			rowsEnter.append("td")
-			 .text(function(d){return d.data.score });
-			// Column-2
-			rowsEnter.append("td") 
-			 .append("a")
-			 .attr({
-			   href:function(d){return d.data.url }
-			  })
-			 .append("img")
-			 .attr({
-			   src: function(d){return d.data.thumbnail }
-			  });
-			// Column-3
-			rowsEnter.append("td")
-			 .append("a")
-			 .attr({
-			   href:function(d){return d.data.url }
-			  })
-			 .text(function(d){return d.data.title });
-			// Column-4
-			rowsEnter.append("td")
-			 .text(function(d){return d.data.ups });
-			// Column-5
-			rowsEnter.append("td")
-			.text(function(d){return d.data.downs });	
+			addColumn(rowsEnter);
 			//exit() method to adjust automatic row removal
 			rows.exit().remove();
-			// console.log("container",container);
-			// console.log("data",data);
-			// console.log("width",width);
 		 };
 		//grab data
 		chart.data  = function(value){
@@ -78,56 +45,7 @@ angular.module('serveMeApp')
 		
 		return chart;
      };
-    d3.chart.tableapi  = function(){ 
-	
-		var data;
-		var width;
 
-		//reusable chart pattern
-		function chart (container){
-			//initialization code
-
-			//append dynamic table with responsive bootstrap into container div 
-			var table = container.append("table").classed("table table-bordred table-striped",true);
-			//append thead to table
-			var thead = table.append('thead');
-			//append tbody to table
-			var tbody = table.append('tbody');
-			//selectAll rows with with data to tbody element, use selectAll as this are dynamic entries and non exisyent till now.
-			var rows = tbody.selectAll("tr").data(data);
-
-			//create all dynamic rows with enter() command
-			var rowsEnter = rows.enter()
-			.append("tr");
-
-			//Create columns with cell data in each row --column-1
-			rowsEnter.append("td")
-			 .text(function(d){return d.name });
-			// Column-2
-			rowsEnter.append("td")
-			.text(function(d){return d.info });	
-			//exit() method to adjust automatic row removal
-			rows.exit().remove();
-			// console.log("container",container);
-			// console.log("data",data);
-			// console.log("width",width);
-		 };
-		//grab data
-		chart.data  = function(value){
-		 	if(!arguments.length) return data;
-		 	data = value;
-		 	return chart;
-		 };
-		//width function 
-		chart.width = function(value){
-		  if(!arguments.length) return width;
-		 	width = value;
-		 	return chart;
-		 };
-		 //return chart function as the condition of reusable chart pattern
-		
-		return chart;
-     };  
    	// *********************Scatter Polt******************************
 	d3.chart.scatter   = function(){
 		var g;
@@ -186,6 +104,7 @@ angular.module('serveMeApp')
 		
 		return chart;
 	 }; 
+
     // *********************Brush******************************
  	d3.chart.brush 	   = function(){
     	var  g;
@@ -240,56 +159,44 @@ angular.module('serveMeApp')
 	//make json or api call to get the data and run reusable chart functions,charts such as Table,scatter plot, histogram
 
   	// *********************TABLE******************************
-	$rootScope.getStatic_JSONData = function(){
-		//Data Calling from static JSON
-		d3.json('assets/dataDir/data.json',function(err,pics){
-			// capture data in a avariable		
-			var data = pics.data.children;
-			data.forEach(function(d){
-				d.data.created *=1000;
-			 });
+	$rootScope.tableDisplay = function(url,dataType,targetDiv,prepareData,addColumn){
+	 var data = '';	
 
-			console.log(data);
-			//table
+	 if(dataType == "JSON"){
+	   d3.json(url,function(err,payload){
+		  // capture data in a avariable		
+		  data = prepareData(payload);
+		 });
+	  } else if (dataType == "CSV"){
 
+		 	
+		 }   
+	   setTimeout(function(){
+			//build table using d3.chart.table function
 			//parent Div where table will be inserted
-			var display = d3.select('.col-md-12');
+			var display = d3.select(targetDiv);
 			//table container
 			var tdiv = display.append("div").classed("table-responsive",true);
 			//instantiate chart function
-			var table = d3.chart.tablejson();
+			var table = d3.chart.table(addColumn);
 			//set Data to table
 			table.data(data);
 			//render table
 			table(tdiv);		
+		 },200)
+		
+		// var svg = d3.select("#svg3")
+		// //scatter plot
+		// var sgroup = svg.append("g");
+		// var scatter = d3.chart.scatter();
+		// scatter.data(data);
+		// scatter(sgroup);
 
-			var svg = d3.select("#svg3")
-			//scatter plot
-			var sgroup = svg.append("g");
-			var scatter = d3.chart.scatter();
-			scatter.data(data);
-			scatter(sgroup);
-		 });	
+	 // 	}
+		// //Data Calling from static JSON
+			
+	  };
 
-	 };
-	$rootScope.getAPI_JSONData	  = function(){
-		//data calling from api 
-		d3.json('/api/things/',function(err,thing){
-			//capture data in a avariable		
-			var data = thing;
-			//parent Div where table will be inserted
-			var display = d3.select('.col-md-12');
-
-			//table container
-			var tdiv = display.append("div").classed("table-responsive",true);
-			//instantiate chart function
-			var table = d3.chart.tableapi();
-			//set Data to table
-			table.data(data);
-			//render table
-			table(tdiv);		
-		 });	
-	 };	 
 	// *********************Histogram******************************
 	$rootScope.histogram          = function(){ 
 		//histogram layout with reddit data json
@@ -327,6 +234,7 @@ angular.module('serveMeApp')
 
 
 	// *********************BAR CHARTS******************************
+
 
 	// *******Chart configuration***********	
 	var margin = {top: 20, right: 50, bottom: 80, left: 50},
@@ -429,39 +337,44 @@ angular.module('serveMeApp')
 		});
 
 	// **************load data from API call********************
-	d3.json("/api/dataViews/",function(err,data){
+	// d3.json("/api/data/",function(err,data){
 
-		//define domain with data range
-		x.domain(data.map(function(d) { return d.AppsName; }));
-		// x.domain(function(d) {return d.AppsName ; });
-		y.domain([0,d3.max(data,function(d) {return d.LicenseUsed ; })]);
+	// 	//define domain with data range
+	// 	x.domain(data.map(function(d) { return d.AppsName; }));
+	// 	// x.domain(function(d) {return d.AppsName ; });
+	// 	y.domain([0,d3.max(data,function(d) {return d.LicenseUsed ; })]);
 
-		// console.log(data);
-		//append and call xAxis to display xAxis
-		chart.append("g")
-		.attr("class","x axis")
-		.attr("transform", "translate(0," + (height +30)  + ")")
-		.call(xAxis);
+	// 	// console.log(data);
+	// 	//append and call xAxis to display xAxis
+	// 	chart.append("g")
+	// 	.attr("class","x axis")
+	// 	.attr("transform", "translate(0," + (height +30)  + ")")
+	// 	.call(xAxis);
 
-		//append and call yAxis to display yAxis
-		chart.append("g")
-		.attr("class","y axis")
-		.call(yAxis)
-		.append("text")
-		.attr("transform","rotate(-90)")
-		.attr("y",5)
-		.attr("dy",".71em")
-		.style("text-anchor","end")
-		.text("information");
+	// 	//append and call yAxis to display yAxis
+	// 	chart.append("g")
+	// 	.attr("class","y axis")
+	// 	.call(yAxis)
+	// 	.append("text")
+	// 	.attr("transform","rotate(-90)")
+	// 	.attr("y",5)
+	// 	.attr("dy",".71em")
+	// 	.style("text-anchor","end")
+	// 	.text("information");
 
-		// insert data and bind to virtual elements for bar charts  
-		chart.selectAll(".bar")
-		.data(data)
-		.enter().append("rect")
-		.attr("class","bar")
-		.attr("x",function(d){return x(d.AppsName) ;})
-		.attr("y",function(d){return y(d.LicenseUsed) ;})
-		.attr("height",function(d){return height - y(d.LicenseUsed) ;})
-		.attr("width",5);
-	 });
+	// 	// insert data and bind to virtual elements for bar charts  
+	// 	chart.selectAll(".bar")
+	// 	.data(data)
+	// 	.enter().append("rect")
+	// 	.attr("class","bar")
+	// 	.attr("x",function(d){return x(d.AppsName) ;})
+	// 	.attr("y",function(d){return y(d.LicenseUsed) ;})
+	// 	.attr("height",function(d){return height - y(d.LicenseUsed) ;})
+	// 	.attr("width",5);
+	//  });
+
+	return {
+		tableDisplay:$rootScope.tableDisplay
+	}
+
   }]);
