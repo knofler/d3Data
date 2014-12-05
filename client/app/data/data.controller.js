@@ -62,5 +62,8 @@ angular.module('serveMeApp')
 
     //call scatterplot service
     dataSrv.scatterPlotDisplay("/assets/dataDir/data.json","JSON","#svg3",$scope.prepare_scatterdata); 
+
+    //call Brush service
+ 	dataSrv.brushDisplay("/assets/dataDir/data.json","JSON","#svg4",$scope.prepare_scatterdata); 
   	
   }]);

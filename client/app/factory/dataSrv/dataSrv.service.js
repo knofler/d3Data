@@ -102,49 +102,87 @@ angular.module('serveMeApp')
  	d3.chart.brush 	 = function (){
     	var  g;
     	var data;
-    	var width = 400;
-    	var height = 400;
+    	var width = 600;
+    	var height = 30;
 
     	function chart (container) {
     		g = container;
     		var maxScore = d3.max(data,function(d){return d.data.score});
     		var yScale = d3.scale.linear();
-    	}
-    	//Brush generator
-		//select brush element
-		var brushElem = d3.select("#brush");
-		//create scale first
-		var scale = d3.scale.linear()
-					.domain([20,30])
-					.range([10,300]);
-		//Generate brush			
-		var brush = d3.svg.brush();
-		brush.x(scale);
-		brush.extent([22,28]);
 
-		var g = brushElem.append("g");
-		brush(g);
+    		var extent = d3.extent(data, function(d){
+    			return d.data.created
+    		 });
+			var scale = d3.scale.linear()
+				.domain(extent)
+				.range([0,width]);
+			// var color = d3.time.scale()
+			// 	.domain(d3.extent(data,function(d){return d.data.score}))
+			// 	.range(["#3D3DF7","#F81A1A"])
+			// 	.interpolate(d3.interpolateHsl);	
 
-		g.attr("transform","trabslate(50,100)")
-		g.selectAll("rect").attr("height",height);
-		g.selectAll("background")
-		 .style({fill :"#4B9E9E",visibility:"visible"})
-		g.selectAll("extent")
-		 .style({fill :"#78C5C5",visibility:"visible"})
-		g.selectAll(".resize rect")
-		 .style({fill :"#276C86",visibility:"visible"})  
+			//Generate brush			
+			var brush = d3.svg.brush();	
+			brush.x(scale);
+			brush(g);
 
-		var rects = g.selectAll("rect.events")
-		.data(data) 
-		rects.enter()
-		.append("rect").classed("events",true);
+			// g.attr("transform","trabslate(50,100)")
+			g.selectAll("rect").attr("height",height);
+			g.selectAll("background")
+			 .style({fill :"#4B9E9E",visibility:"visible"})
+			g.selectAll("extent")
+			 .style({fill :"#78C5C5",visibility:"visible"})
+			g.selectAll(".resize rect")
+			 .style({fill :"#276C86",visibility:"visible"})  
 
-		rects.attr({
-			x:function(d){return scale(d.data.created)},
-			y:0,
-			width:1,
-			height:height
-		}).style("pointer-events","none")
+			var rects = g.selectAll("rect.events")
+			.data(data) 
+			rects.enter()
+			.append("rect").classed("events",true);
+
+			rects.attr({
+				x:function(d){return scale(d.data.created)},
+				y:0,
+				width:1,
+				height:height
+			 }).style("pointer-events","none"); 
+
+			rects.exit().remove();
+
+			brush.on("brushend",function(){
+				var ext = brush.extent();
+				var filtered = data.filter(function(d){
+					return (d.data.created > ext[0] && d.data.created < ext[1]);
+				 });
+				g.selectAll("rect.events")
+				.style({"stroke":"#fff"});
+
+				g.selectAll("rects.events")
+				.data(filtered,function(d){return d.data.id})
+				.style({
+					// stroke:function(d){return color(d.data.score)}
+					stroke:"#fff"
+				 });
+			 });
+    	 }
+		chart.data   = function(value){
+		 	if(!arguments.length) return data;
+		 	data = value;
+		 	return chart;
+		 };
+		chart.width  = function(value){
+		 	if(!arguments.length) return width;
+		 	width = value;
+		 	return chart;
+		 };
+		chart.height = function(value){
+		  if(!arguments.length) return height;
+		 	height = value;
+		 	return chart;
+		 };
+		 
+		//return chart function as the condition of reusable chart pattern
+		return chart;
      };
 
     // ######################## Calling d3 reusable chart functions ################################## 
@@ -198,6 +236,29 @@ angular.module('serveMeApp')
 		 scatter(sgroup);	
 		},200)
 	  };
+	$rootScope.brushDisplay = function (url,dataType,targetDiv,prepareData){
+	 var data = '';	
+
+	 if(dataType == "JSON"){
+	   d3.json(url,function(err,payload){
+		  // capture data in a avariable		
+		  data = prepareData(payload);
+		 });
+	  } else if (dataType == "CSV"){
+
+		 	
+		 }   
+
+
+	   setTimeout(function(){
+		 var svg = d3.select(targetDiv)
+		 //scatter plot
+		 var bgroup = svg.append("g");
+		 var brush  = d3.chart.brush();
+		 brush.data(data);
+		 brush(bgroup);	
+		},200)
+	  };  
 
 	// *********************Histogram******************************
 	$rootScope.histogram          = function(){ 
@@ -376,8 +437,9 @@ angular.module('serveMeApp')
 	//  });
 
 	return {
-		tableDisplay:$rootScope.tableDisplay,
-		scatterPlotDisplay:$rootScope.scatterPlotDisplay
+		tableDisplay		: $rootScope.tableDisplay,
+		scatterPlotDisplay  : $rootScope.scatterPlotDisplay,
+		brushDisplay		: $rootScope.brushDisplay
 	}
 
   }]);
