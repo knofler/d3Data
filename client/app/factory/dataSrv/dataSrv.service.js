@@ -7,7 +7,7 @@ angular.module('serveMeApp')
 	// Construction of reusable table function in d3 chart object	
 	// *********************Table******************************
 	if (!d3.chart) d3.chart = {};
-	d3.chart.table = function(addColumn){ 
+	d3.chart.table   = function (addColumn){ 
 		var data,width;
 		//reusable chart pattern
 		function chart (container){
@@ -45,21 +45,17 @@ angular.module('serveMeApp')
 		
 		return chart;
      };
-
-   	// *********************Scatter Polt******************************
-	d3.chart.scatter   = function(){
-		var g;
-		var data;
-		var width = 400;
-		var height = 400;
+	d3.chart.scatter = function (){
+		var g,data;
+		var width = 400, height = 400;
 
 		//reusable chart pattern
 		function chart (container){
 			//initialization code
 			g = container;
 			
-			var maxScore = d3.max(data,function(d){return d.data.score});
-			
+			var maxScore 	= d3.max(data,function(d){return d.data.score});
+
 			var yScale	= d3.scale.linear()
 			.domain([0,maxScore])
 			.range([0,height]);
@@ -84,7 +80,7 @@ angular.module('serveMeApp')
 			})
 		 };
 		//grab data
-		chart.data  = function(value){
+		chart.data   = function(value){
 		 	if(!arguments.length) return data;
 		 	data = value;
 		 	return chart;
@@ -94,7 +90,6 @@ angular.module('serveMeApp')
 		 	width = value;
 		 	return chart;
 		 };
-		//width function 
 		chart.height = function(value){
 		  if(!arguments.length) return height;
 		 	height = value;
@@ -104,9 +99,7 @@ angular.module('serveMeApp')
 		
 		return chart;
 	 }; 
-
-    // *********************Brush******************************
- 	d3.chart.brush 	   = function(){
+ 	d3.chart.brush 	 = function (){
     	var  g;
     	var data;
     	var width = 400;
@@ -154,12 +147,10 @@ angular.module('serveMeApp')
 		}).style("pointer-events","none")
      };
 
-
     // ######################## Calling d3 reusable chart functions ################################## 
 	//make json or api call to get the data and run reusable chart functions,charts such as Table,scatter plot, histogram
 
-  	// *********************TABLE******************************
-	$rootScope.tableDisplay = function(url,dataType,targetDiv,prepareData,addColumn){
+	$rootScope.tableDisplay 	  = function (url,dataType,targetDiv,prepareData,addColumn){
 	 var data = '';	
 
 	 if(dataType == "JSON"){
@@ -184,17 +175,28 @@ angular.module('serveMeApp')
 			//render table
 			table(tdiv);		
 		 },200)
-		
-		// var svg = d3.select("#svg3")
-		// //scatter plot
-		// var sgroup = svg.append("g");
-		// var scatter = d3.chart.scatter();
-		// scatter.data(data);
-		// scatter(sgroup);
+	  };
+	$rootScope.scatterPlotDisplay = function (url,dataType,targetDiv,prepareData){
+	 var data = '';	
 
-	 // 	}
-		// //Data Calling from static JSON
-			
+	 if(dataType == "JSON"){
+	   d3.json(url,function(err,payload){
+		  // capture data in a avariable		
+		  data = prepareData(payload);
+		 });
+	  } else if (dataType == "CSV"){
+
+		 	
+		 }   
+	   setTimeout(function(){
+		 var svg = d3.select(targetDiv)
+		 //scatter plot
+		 var sgroup = svg.append("g");
+		 var scatter = d3.chart.scatter();
+		 // console.log("check data ", data);
+		 scatter.data(data);
+		 scatter(sgroup);	
+		},200)
 	  };
 
 	// *********************Histogram******************************
@@ -237,104 +239,104 @@ angular.module('serveMeApp')
 
 
 	// *******Chart configuration***********	
-	var margin = {top: 20, right: 50, bottom: 80, left: 50},
-		width =	 960 - margin.left - margin.right,
-		height = 500 - margin.top - margin.bottom;
-	//Define scale first
-	var x = d3.scale.ordinal().rangeRoundBands([0,width],.75);	
-	var y = d3.scale.linear().range([height,100]);
-	//insert scales to appropriate axis 	
-	var xAxis = d3.svg.axis()
-		.scale(x)
-		.orient("bottom")
-	var yAxis = d3.svg.axis()
-		.scale(y)
-		.orient("left");
+	// var margin = {top: 20, right: 50, bottom: 80, left: 50},
+	// 	width =	 960 - margin.left - margin.right,
+	// 	height = 500 - margin.top - margin.bottom;
+	// //Define scale first
+	// var x = d3.scale.ordinal().rangeRoundBands([0,width],.75);	
+	// var y = d3.scale.linear().range([height,100]);
+	// //insert scales to appropriate axis 	
+	// var xAxis = d3.svg.axis()
+	// 	.scale(x)
+	// 	.orient("bottom")
+	// var yAxis = d3.svg.axis()
+	// 	.scale(y)
+	// 	.orient("left");
 
-	//create chart in any svg container		
-	var chart = d3.select("#svg1")
-		.attr("width",width + margin.left + margin.right)
-		.attr("height",height + margin.top +margin.bottom)
-		.append("g")
-		.attr("transform","translate(" + margin.right + "," + margin.top + ")");  //This is used for creating the margin for axises
+	// //create chart in any svg container		
+	// var chart = d3.select("#svg1")
+	// 	.attr("width",width + margin.left + margin.right)
+	// 	.attr("height",height + margin.top +margin.bottom)
+	// 	.append("g")
+	// 	.attr("transform","translate(" + margin.right + "," + margin.top + ")");  //This is used for creating the margin for axises
 		
-	function type(d) {
-  	  d.value = +d.value; // coerce to number
-  	  return d;
-	 };	
+	// function type(d) {
+ //  	  d.value = +d.value; // coerce to number
+ //  	  return d;
+	//  };	
 
 
 	// **************load data from csv*************************	
-	d3.csv("assets/dataDir/data.csv",type,function(error,data){
-		// console.log(data);
-		//define domain with data range
-		x.domain(data.map(function(d) { return d.name; }));
-		y.domain([0, d3.max(data, function(d) { return d.value; })]);
-		//append and call xAxis to display xAxis
-		chart.append("g")
-		 .attr("class", "x axis")
-		 .attr("transform", "translate(0," + height + ")")
-		 .call(xAxis);
+	// d3.csv("assets/dataDir/data.csv",type,function(error,data){
+	// 	// console.log(data);
+	// 	//define domain with data range
+	// 	x.domain(data.map(function(d) { return d.name; }));
+	// 	y.domain([0, d3.max(data, function(d) { return d.value; })]);
+	// 	//append and call xAxis to display xAxis
+	// 	chart.append("g")
+	// 	 .attr("class", "x axis")
+	// 	 .attr("transform", "translate(0," + height + ")")
+	// 	 .call(xAxis);
 
-		//append and call yAxis to display yAxis 
-		chart.append("g")
-		  .attr("class", "y axis")
-		  .call(yAxis)
-		  .append("text")
-		  .attr("transform","rotate(-90)")
-		  .attr("y",5)
-		  .attr("dy",".71em")
-		  .style("text-anchor","end")
-		  .text("information");
+	// 	//append and call yAxis to display yAxis 
+	// 	chart.append("g")
+	// 	  .attr("class", "y axis")
+	// 	  .call(yAxis)
+	// 	  .append("text")
+	// 	  .attr("transform","rotate(-90)")
+	// 	  .attr("y",5)
+	// 	  .attr("dy",".71em")
+	// 	  .style("text-anchor","end")
+	// 	  .text("information");
 
-		// insert data and bind to virtual elements for bar charts  
-		chart.selectAll(".bar")
-		.data(data)
-		.enter().append("rect")
-		  .attr("class", "bar")
-		  .attr("x", function(d) { return x(d.name); })
-		  .attr("y", function(d) { return y(d.value); })
-		  .attr("height", function(d) { return height - y(d.value); })
-		  .attr("width", x.rangeBand());
-	 });
+	// 	// insert data and bind to virtual elements for bar charts  
+	// 	chart.selectAll(".bar")
+	// 	.data(data)
+	// 	.enter().append("rect")
+	// 	  .attr("class", "bar")
+	// 	  .attr("x", function(d) { return x(d.name); })
+	// 	  .attr("y", function(d) { return y(d.value); })
+	// 	  .attr("height", function(d) { return height - y(d.value); })
+	// 	  .attr("width", x.rangeBand());
+	//  });
 	
-	// **************load data from Static JSON*****************	
-	d3.json('assets/dataDir/data.json',function(err,pics){
-	  var data = pics.data.children;
+	// // **************load data from Static JSON*****************	
+	// d3.json('assets/dataDir/data.json',function(err,pics){
+	//   var data = pics.data.children;
 
-	  	console.log(data); 
+	//   	console.log(data); 
 
-	  //define domain with data range
-		x.domain(data.map(function(d) { return d.data.name; }));
-		y.domain([1900,3000]);
+	//   //define domain with data range
+	// 	x.domain(data.map(function(d) { return d.data.name; }));
+	// 	y.domain([1900,3000]);
 
-		//append and call xAxis to display xAxis
-	   	chart.append("g")
-	      .attr("class", "x axis")
-	      .attr("transform", "translate(0," + height + ")")
-	      .call(xAxis);
+	// 	//append and call xAxis to display xAxis
+	//    	chart.append("g")
+	//       .attr("class", "x axis")
+	//       .attr("transform", "translate(0," + height + ")")
+	//       .call(xAxis);
 
-	    //append and call yAxis to display yAxis 
-	   	chart.append("g")
-	      .attr("class", "y axis")
-	      .call(yAxis)
-	      .append("text")
-	      .attr("transform","rotate(-90)")
-	      .attr("y",5)
-	      .attr("dy",".71em")
-	      .style("text-anchor","end")
-	      .text("information");
+	//     //append and call yAxis to display yAxis 
+	//    	chart.append("g")
+	//       .attr("class", "y axis")
+	//       .call(yAxis)
+	//       .append("text")
+	//       .attr("transform","rotate(-90)")
+	//       .attr("y",5)
+	//       .attr("dy",".71em")
+	//       .style("text-anchor","end")
+	//       .text("information");
 
-	    // insert data and bind to virtual elements for bar charts  
-	   	chart.selectAll(".bar")
-	      .data(data)
-	    .enter().append("rect")
-	      .attr("class", "bar")
-	      .attr("x", function(d) { return x(d.data.name); })
-	      .attr("y", function(d) { return y(d.data.score); })
-	      .attr("height", function(d) { return height - y(d.data.score); })
-	      .attr("width", x.rangeBand());
-		});
+	//     // insert data and bind to virtual elements for bar charts  
+	//    	chart.selectAll(".bar")
+	//       .data(data)
+	//     .enter().append("rect")
+	//       .attr("class", "bar")
+	//       .attr("x", function(d) { return x(d.data.name); })
+	//       .attr("y", function(d) { return y(d.data.score); })
+	//       .attr("height", function(d) { return height - y(d.data.score); })
+	//       .attr("width", x.rangeBand());
+	// 	});
 
 	// **************load data from API call********************
 	// d3.json("/api/data/",function(err,data){
@@ -374,7 +376,8 @@ angular.module('serveMeApp')
 	//  });
 
 	return {
-		tableDisplay:$rootScope.tableDisplay
+		tableDisplay:$rootScope.tableDisplay,
+		scatterPlotDisplay:$rootScope.scatterPlotDisplay
 	}
 
   }]);

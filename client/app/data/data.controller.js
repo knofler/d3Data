@@ -50,10 +50,17 @@ angular.module('serveMeApp')
 			.text(function(d){return d.info });	
      };
 
+    $scope.prepare_scatterdata = function (payload){
+		var data = payload.data.children;
+		return data;
+	 }; 
 
+
+    //call table service 
     dataSrv.tableDisplay("/assets/dataDir/data.json","JSON",".col-md-12",$scope.prepare_Redditdata,$scope.addredditColumn);
-    dataSrv.tableDisplay("/api/things/","JSON",".col-md-12",$scope.prepare_thingsdata,$scope.addThingsColumn)  
+    dataSrv.tableDisplay("/api/things/","JSON",".col-md-12",$scope.prepare_thingsdata,$scope.addThingsColumn);  
 
-    // dataSrv.tableapifunc();
+    //call scatterplot service
+    dataSrv.scatterPlotDisplay("/assets/dataDir/data.json","JSON","#svg3",$scope.prepare_scatterdata); 
   	
   }]);
