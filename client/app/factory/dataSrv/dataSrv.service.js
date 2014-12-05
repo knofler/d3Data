@@ -47,13 +47,13 @@ angular.module('serveMeApp')
      };
 	d3.chart.scatter = function (){
 		var g,data;
-		var width = 400, height = 400;
+		var width = 400, height = 70;
 
 		//reusable chart pattern
 		function chart (container){
 			//initialization code
 			g = container;
-			
+			var minScore 	= d3.min(data,function(d){return d.data.score});	
 			var maxScore 	= d3.max(data,function(d){return d.data.score});
 
 			var yScale	= d3.scale.linear()
@@ -62,11 +62,10 @@ angular.module('serveMeApp')
 
 			var xScale  = d3.scale.ordinal()
 			.domain(d3.range(data.length))
-			.rangeBands([1,611],0.64);
+			.rangeBands([0,680],0.34);
 
 			var g = g.append("g")
-			.attr({"transform":"translate(27,50)"})
-
+			.attr("transform","translate(31,135)")
 			var circles = g.selectAll("circle")
 			.data(data);
 
@@ -102,15 +101,14 @@ angular.module('serveMeApp')
  	d3.chart.brush 	 = function (){
     	var  g;
     	var data;
-    	var width = 600;
-    	var height = 30;
+    	var width = 800;
+    	var height = 40;
 
     	function chart (container) {
     		g = container;
-    		var maxScore = d3.max(data,function(d){return d.data.score});
-    		var yScale = d3.scale.linear();
 
     		var extent = d3.extent(data, function(d){
+    			// console.log("data created",d.data.created)
     			return d.data.created
     		 });
 			var scale = d3.scale.linear()
@@ -128,9 +126,9 @@ angular.module('serveMeApp')
 
 			// g.attr("transform","trabslate(50,100)")
 			g.selectAll("rect").attr("height",height);
-			g.selectAll("background")
+			g.selectAll(".background")
 			 .style({fill :"#4B9E9E",visibility:"visible"})
-			g.selectAll("extent")
+			g.selectAll(".extent")
 			 .style({fill :"#78C5C5",visibility:"visible"})
 			g.selectAll(".resize rect")
 			 .style({fill :"#276C86",visibility:"visible"})  
@@ -150,6 +148,7 @@ angular.module('serveMeApp')
 			rects.exit().remove();
 
 			brush.on("brushend",function(){
+				console.log(brush.extent())
 				var ext = brush.extent();
 				var filtered = data.filter(function(d){
 					return (d.data.created > ext[0] && d.data.created < ext[1]);
@@ -221,6 +220,7 @@ angular.module('serveMeApp')
 	   d3.json(url,function(err,payload){
 		  // capture data in a avariable		
 		  data = prepareData(payload);
+
 		 });
 	  } else if (dataType == "CSV"){
 
@@ -234,9 +234,9 @@ angular.module('serveMeApp')
 		 // console.log("check data ", data);
 		 scatter.data(data);
 		 scatter(sgroup);	
-		},200)
+		},100)
 	  };
-	$rootScope.brushDisplay = function (url,dataType,targetDiv,prepareData){
+	$rootScope.brushDisplay 	  = function (url,dataType,targetDiv,prepareData){
 	 var data = '';	
 
 	 if(dataType == "JSON"){

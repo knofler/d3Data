@@ -52,6 +52,11 @@ angular.module('serveMeApp')
 
     $scope.prepare_scatterdata = function (payload){
 		var data = payload.data.children;
+		data.forEach(function(d){
+			d.data.created *= 1000;
+		})
+		// console.log(data);
+
 		return data;
 	 }; 
 
