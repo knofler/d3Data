@@ -60,12 +60,15 @@ angular.module('serveMeApp')
 			.domain([0,maxScore])
 			.range([0,height]);
 
-			var xScale  = d3.scale.ordinal()
-			.domain(d3.range(data.length))
-			.rangeBands([0,680],0.34);
+			// var xScale  = d3.scale.ordinal()
+			// .domain(d3.range(data.length))
+			// .rangeBands([0,680],0.34);
 
-			var g = g.append("g")
-			.attr("transform","translate(31,135)")
+			var xScale = d3.time.scale()
+				.domain(d3.extent(data,function(d){return d.data.created}))
+				.range([0,width]);
+
+			g.attr("transform","translate(31,135)")
 			var circles = g.selectAll("circle")
 			.data(data);
 
@@ -73,10 +76,12 @@ angular.module('serveMeApp')
 			.append("circle");	
 
 			circles.attr({
-				cx:function(d,i){return xScale(i)},
+				cx:function(d,i){return xScale(d.data.created)},
 				cy:function(d,i){return yScale(d.data.score)},
 				r:10
 			})
+
+			circles.exit().remove();
 		 };
 		//grab data
 		chart.data   = function(value){
@@ -163,6 +168,23 @@ angular.module('serveMeApp')
 					stroke:"#fff"
 				 });
 			 });
+
+			console.log("extent",new Date(extent[0]))
+
+			var axis = d3.svg.axis()
+				.scale(scale)
+				.orient("bottom")
+				.tickValues([new Date(extent[0]),new Date(extent[0] + (extent[1]-extent[0]) /2 ),new Date(extent[1])])
+				.tickFormat(d3.time.format("%x %H:%M"))
+
+			var agroup = g.append("g")
+			agroup.attr("transform","translate(0,41)")
+			axis(agroup);
+			agroup.selectAll("path")
+			 .style({fill :"none",stroke:"#000"})
+			agroup.selectAll("line")
+			 .style({stroke:"#000"})  
+
     	 }
 		chart.data   = function(value){
 		 	if(!arguments.length) return data;
