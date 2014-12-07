@@ -11,3 +11,13 @@
 	width: 700px;
 	height: 380px;
 }
+.axis{
+	font-size: 10px;
+}
+.axis path{
+	fill:none;
+	stroke:#000000;
+}
+.axis tick line{
+	stroke:#000;
+}

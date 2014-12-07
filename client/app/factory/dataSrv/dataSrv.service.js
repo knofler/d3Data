@@ -48,17 +48,62 @@ angular.module('serveMeApp')
 	d3.chart.scatter = function (){
 		var g,data;
 		var width = 400, height = 70;
+		var cx = 10;
 
 		//reusable chart pattern
 		function chart (container){
 			//initialization code
 			g = container;
+
+			g.append("g")
+			.classed("xaxis",true);
+
+			g.append("g")
+			.classed("yaxis",true);
+
+			update();
+		};
+		chart.update = update;
+			
+		function update(){	
+			var maxCreated = d3.max(data,function(d){return d.data.created});
+			var minCreated = d3.min(data,function(d){return d.data.created});
 			var minScore 	= d3.min(data,function(d){return d.data.score});	
 			var maxScore 	= d3.max(data,function(d){return d.data.score});
 
+			var createScale = d3.time.scale()
+				.domain([minCreated,maxCreated])
+				.range([cx,width]);
+
+			var colorScale = d3.scale.linear()
+				.domain([minCreated,maxCreated])
+				.range(["#D5E9E5","#12882A"])
+				.interpolate(d3.interpolateHcl)
+
 			var yScale	= d3.scale.linear()
 			.domain([0,maxScore])
-			.range([0,height]);
+			.range([height,cx]);
+
+			var xAxis = d3.svg.axis()
+				.scale(createScale)
+				.ticks(3)
+				.tickFormat(d3.time.format("%x,%H:%M"));
+
+			var yAxis = d3.svg.axis()
+				.scale(yScale)
+				.ticks(3)
+				.orient("left");
+
+			var xg = g.select(".xaxis")
+				    .classed("axis",true)
+					.attr("transform","translate(" + [0,height] + ")")
+					.call(xAxis);
+
+			var yg = g.select(".yaxis")
+					.classed("axis",true)
+					.classed("yAxis",true)
+					.attr("transform","translate(" + [cx - 5.0] + ")")
+					.call(yAxis);
 
 			// var xScale  = d3.scale.ordinal()
 			// .domain(d3.range(data.length))
@@ -69,6 +114,7 @@ angular.module('serveMeApp')
 				.range([0,width]);
 
 			g.attr("transform","translate(31,135)")
+
 			var circles = g.selectAll("circle")
 			.data(data);
 
@@ -108,9 +154,15 @@ angular.module('serveMeApp')
     	var data;
     	var width = 800;
     	var height = 40;
+    	var dispatch = d3.dispatch(chart,"filter");
 
     	function chart (container) {
     		g = container;
+    		var xg = g.append("g")
+    			.classed("axis",true)
+    			.classed("xaxis",true)
+
+    		// update();	
 
     		var extent = d3.extent(data, function(d){
     			// console.log("data created",d.data.created)
@@ -167,6 +219,10 @@ angular.module('serveMeApp')
 					// stroke:function(d){return color(d.data.score)}
 					stroke:"#fff"
 				 });
+
+				//emit filtered data
+				dispatch.filter(filtered);
+
 			 });
 
 			console.log("extent",new Date(extent[0]))
@@ -203,7 +259,8 @@ angular.module('serveMeApp')
 		 };
 		 
 		//return chart function as the condition of reusable chart pattern
-		return chart;
+		// return chart;
+		return d3.rebind(chart,dispatch,"on");
      };
 
     // ######################## Calling d3 reusable chart functions ################################## 
@@ -251,11 +308,11 @@ angular.module('serveMeApp')
 	   setTimeout(function(){
 		 var svg = d3.select(targetDiv)
 		 //scatter plot
-		 var sgroup = svg.append("g");
-		 var scatter = d3.chart.scatter();
+		 $rootScope.sgroup = svg.append("g");
+		 $rootScope.scatter = d3.chart.scatter();
 		 // console.log("check data ", data);
-		 scatter.data(data);
-		 scatter(sgroup);	
+		 $rootScope.scatter.data(data);
+		 $rootScope.scatter($rootScope.sgroup);	
 		},100)
 	  };
 	$rootScope.brushDisplay 	  = function (url,dataType,targetDiv,prepareData){
@@ -279,6 +336,11 @@ angular.module('serveMeApp')
 		 var brush  = d3.chart.brush();
 		 brush.data(data);
 		 brush(bgroup);	
+		 brush.on("filter",function(filtered){
+		 	console.log("filtered",filtered);
+		 	$rootScope.scatter.data(filtered);
+		 	$rootScope.scatter.update();
+		 })
 		},200)
 	  };  
 
