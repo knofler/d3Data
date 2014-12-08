@@ -62,7 +62,8 @@ angular.module('serveMeApp')
 			.classed("yaxis",true);
 
 			update();
-		};
+			};
+		
 		chart.update = update;
 			
 		function update(){	
@@ -97,12 +98,14 @@ angular.module('serveMeApp')
 			var xg = g.select(".xaxis")
 				    .classed("axis",true)
 					.attr("transform","translate(" + [0,height] + ")")
+					.transition()
 					.call(xAxis);
 
 			var yg = g.select(".yaxis")
 					.classed("axis",true)
 					.classed("yAxis",true)
 					.attr("transform","translate(" + [cx - 5.0] + ")")
+					.transition()
 					.call(yAxis);
 
 			// var xScale  = d3.scale.ordinal()
@@ -121,7 +124,9 @@ angular.module('serveMeApp')
 			circles.enter()
 			.append("circle");	
 
-			circles.attr({
+			circles
+			.transition()
+			.attr({
 				cx:function(d,i){return xScale(d.data.created)},
 				cy:function(d,i){return yScale(d.data.score)},
 				r:10
@@ -129,6 +134,17 @@ angular.module('serveMeApp')
 
 			circles.exit().remove();
 		 };
+
+		 chart.highlight = function(data){
+		 	var circles = g.selectAll("circle")
+		 	.style("stroke","")
+		 	.style("stroke-width",3)
+
+		 	circles.data(data,function(d){return d.data.id})
+		 	.style("stroke","orange")
+		 	.style("stroke-width",3);
+
+		  };
 		//grab data
 		chart.data   = function(value){
 		 	if(!arguments.length) return data;
@@ -216,8 +232,8 @@ angular.module('serveMeApp')
 				g.selectAll("rects.events")
 				.data(filtered,function(d){return d.data.id})
 				.style({
-					// stroke:function(d){return color(d.data.score)}
-					stroke:"#fff"
+					stroke:function(d){return color(d.data.score)}
+					// stroke:"#fff"
 				 });
 
 				//emit filtered data
@@ -313,6 +329,7 @@ angular.module('serveMeApp')
 		 // console.log("check data ", data);
 		 $rootScope.scatter.data(data);
 		 $rootScope.scatter($rootScope.sgroup);	
+		 $rootScope.scatter.highlight(data.slice(0,10));
 		},100)
 	  };
 	$rootScope.brushDisplay 	  = function (url,dataType,targetDiv,prepareData){
