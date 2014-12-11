@@ -21,3 +21,7 @@
 .axis tick line{
 	stroke:#000;
 }
+.customTable{
+	height: 500px;
+	overflow:scroll;
+}

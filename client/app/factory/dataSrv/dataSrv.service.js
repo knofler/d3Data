@@ -8,11 +8,12 @@ angular.module('serveMeApp')
 	// *********************Table******************************
 	if (!d3.chart) d3.chart = {};
 	d3.chart.table   = function (addColumn){ 
-		var data,width;
+		var data,width,div;
+		var dispatch = d3.dispatch(chart,"hover");
 		//reusable chart pattern
 		function chart (container){
 			//initialization code
-
+			div = container;
 			//append dynamic table with responsive bootstrap into container div 
 			var table = container.append("table").classed("table table-bordred table-striped",true);
 			//append thead to table
@@ -28,8 +29,25 @@ angular.module('serveMeApp')
 			addColumn(rowsEnter);
 			//exit() method to adjust automatic row removal
 			rows.exit().remove();
+
+			rowsEnter.on("mouseover",function(d){
+				d3.select(this).style("background-color","orange");
+				dispatch.hover([d]);
+			});
+			rowsEnter.on("mouseout",function(d){
+				d3.select(this).style("background-color","")
+				dispatch.hover([]);
+			});
 		 };
-		//grab data
+
+		chart.highlight = function(data){
+		 	var trs = div.selectAll("tr")
+		 	.style("background-color","");
+		 	
+		 	trs.data(data,function(d){return d.data.id})
+		 	.style("background-color","grey")
+
+		  };
 		chart.data  = function(value){
 		 	if(!arguments.length) return data;
 		 	data = value;
@@ -43,13 +61,14 @@ angular.module('serveMeApp')
 		 };
 		 //return chart function as the condition of reusable chart pattern
 		
-		return chart;
+		// return chart;
+		return d3.rebind(chart,dispatch,"on");
      };
 	d3.chart.scatter = function (){
 		var g,data;
 		var width = 400, height = 70;
 		var cx = 10;
-
+        var dispatch = d3.dispatch(chart,"hover");
 		//reusable chart pattern
 		function chart (container){
 			//initialization code
@@ -133,19 +152,27 @@ angular.module('serveMeApp')
 			})
 
 			circles.exit().remove();
+
+			circles.on("mouseover",function(d){
+			  d3.select(this).style("fill","orange");
+			  dispatch.hover([d]);
+			});
+			circles.on("mouseout",function(d){
+			  d3.select(this).style("fill","")
+			  dispatch.hover([]);
+			});
 		 };
 
-		 chart.highlight = function(data){
+		chart.highlight = function(data){
 		 	var circles = g.selectAll("circle")
 		 	.style("stroke","")
 		 	.style("stroke-width",3)
 
 		 	circles.data(data,function(d){return d.data.id})
-		 	.style("stroke","orange")
-		 	.style("stroke-width",3);
+		 	.style("stroke","green")
+		 	.style("stroke-width",4);
 
 		  };
-		//grab data
 		chart.data   = function(value){
 		 	if(!arguments.length) return data;
 		 	data = value;
@@ -163,7 +190,8 @@ angular.module('serveMeApp')
 		 };
 		 //return chart function as the condition of reusable chart pattern
 		
-		return chart;
+		// return chart;
+	    return d3.rebind(chart,dispatch,"on");
 	 }; 
  	d3.chart.brush 	 = function (){
     	var  g;
@@ -299,13 +327,17 @@ angular.module('serveMeApp')
 			//parent Div where table will be inserted
 			var display = d3.select(targetDiv);
 			//table container
-			var tdiv = display.append("div").classed("table-responsive",true);
+			var tdiv = display.append("div").classed("table-responsive customTable",true);
 			//instantiate chart function
-			var table = d3.chart.table(addColumn);
+			$rootScope.table = d3.chart.table(addColumn);
 			//set Data to table
-			table.data(data);
+			$rootScope.table.data(data);
 			//render table
-			table(tdiv);		
+			$rootScope.table(tdiv);
+			$rootScope.table.on("hover",function(hovered){
+			  // console.log(hovered)
+			  $rootScope.scatter.highlight(hovered);
+			});		
 		 },200)
 	  };
 	$rootScope.scatterPlotDisplay = function (url,dataType,targetDiv,prepareData){
@@ -329,7 +361,12 @@ angular.module('serveMeApp')
 		 // console.log("check data ", data);
 		 $rootScope.scatter.data(data);
 		 $rootScope.scatter($rootScope.sgroup);	
-		 $rootScope.scatter.highlight(data.slice(0,10));
+		 // arbitary highlight ten scatter plot
+		 // $rootScope.scatter.highlight(data.slice(0,10));
+		 $rootScope.scatter.on("hover",function(hovered){
+			  // console.log(hovered)
+			  $rootScope.table.highlight(hovered);
+			});		
 		},100)
 	  };
 	$rootScope.brushDisplay 	  = function (url,dataType,targetDiv,prepareData){
@@ -344,7 +381,6 @@ angular.module('serveMeApp')
 
 		 	
 		 }   
-
 
 	   setTimeout(function(){
 		 var svg = d3.select(targetDiv)
