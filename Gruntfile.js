@@ -346,6 +346,7 @@ module.exports = function (grunt) {
             'assets/images/{,*/}*.{webp}',
             'assets/fonts/**/*',
             'assets/mespeak/**/*',
+            'assets/dataDir/**/*',
             'index.html'
           ]
         }, {
