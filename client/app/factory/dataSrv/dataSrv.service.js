@@ -367,7 +367,7 @@ angular.module('serveMeApp')
 			  // console.log(hovered)
 			  $rootScope.table.highlight(hovered);
 			});		
-		},100)
+		},2000)
 	  };
 	$rootScope.brushDisplay 	  = function (url,dataType,targetDiv,prepareData){
 	 var data = '';	
@@ -394,7 +394,7 @@ angular.module('serveMeApp')
 		 	$rootScope.scatter.data(filtered);
 		 	$rootScope.scatter.update();
 		 })
-		},200)
+		},2000)
 	  };  
 
 	// *********************Histogram******************************
