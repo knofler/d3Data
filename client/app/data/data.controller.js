@@ -71,12 +71,12 @@ angular.module('serveMeApp')
     //call scatterplot service
     setTimeout(function(){
  	  dataSrv.scatterPlotDisplay("/assets/dataDir/data.json","JSON","#svg3",$scope.prepare_scatterdata); 
-    },1200);
+    },2200);
    
     //call Brush service
     setTimeout(function(){
        dataSrv.brushDisplay("/assets/dataDir/data.json","JSON","#svg4",$scope.prepare_scatterdata); 
-    },1200);
+    },3200);
  	
   	
   }]);
