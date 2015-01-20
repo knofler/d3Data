@@ -62,14 +62,21 @@ angular.module('serveMeApp')
 
 
     //call table service 
+    setTimeout(function(){
        dataSrv.tableDisplay("assets/dataDir/data.json","JSON",".col-md-12",$scope.prepare_Redditdata,$scope.addredditColumn);
+    },4200);
+   
     // dataSrv.tableDisplay("/api/things/","JSON",".col-md-12",$scope.prepare_thingsdata,$scope.addThingsColumn);  
 
     //call scatterplot service
+    setTimeout(function(){
  	  dataSrv.scatterPlotDisplay("assets/dataDir/data.json","JSON","#svg3",$scope.prepare_scatterdata); 
-
+    },4200);
+   
     //call Brush service
+    setTimeout(function(){
        dataSrv.brushDisplay("assets/dataDir/data.json","JSON","#svg4",$scope.prepare_scatterdata); 
+    },4200);
  	
   	
   }]);
