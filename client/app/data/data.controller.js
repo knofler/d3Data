@@ -8,6 +8,7 @@ angular.module('serveMeApp')
 		  data.forEach(function(d){
 			  d.data.created *=1000;
 		     });
+		  console.log("This prepare_Redditdata executed even in production")
 		return data;
 	 };
 	$scope.addredditColumn    = function (rowsEnter){
@@ -62,9 +63,8 @@ angular.module('serveMeApp')
 
 
     //call table service 
-    setTimeout(function(){
        dataSrv.tableDisplay("assets/dataDir/data.json","JSON",".col-md-12",$scope.prepare_Redditdata,$scope.addredditColumn);
-    },4200);
+
    
     // dataSrv.tableDisplay("/api/things/","JSON",".col-md-12",$scope.prepare_thingsdata,$scope.addThingsColumn);  
 
