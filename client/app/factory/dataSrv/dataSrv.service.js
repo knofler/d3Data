@@ -338,7 +338,7 @@ angular.module('serveMeApp')
 			  // console.log(hovered)
 			  $rootScope.scatter.highlight(hovered);
 			});		
-		 },200)
+		 },2000)
 	  };
 	$rootScope.scatterPlotDisplay = function (url,dataType,targetDiv,prepareData){
 	 var data = '';	
